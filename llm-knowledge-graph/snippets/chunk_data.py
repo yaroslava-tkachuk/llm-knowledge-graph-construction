@@ -1,5 +1,6 @@
 from langchain.text_splitter import CharacterTextSplitter
 
+
 text_splitter = CharacterTextSplitter(
     separator="\n\n",
     chunk_size=1500,

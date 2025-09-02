@@ -9,9 +9,12 @@ from langchain_experimental.graph_transformers import LLMGraphTransformer
 from langchain_community.graphs.graph_document import Node, Relationship
 
 from dotenv import load_dotenv
+
+
 load_dotenv()
 
-DOCS_PATH = "llm-knowledge-graph/data/course/pdfs"
+
+DOCS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data/course/pdfs")
 
 llm = ChatOpenAI(
     openai_api_key=os.getenv('OPENAI_API_KEY'), 
@@ -21,7 +24,7 @@ llm = ChatOpenAI(
 embedding_provider = OpenAIEmbeddings(
     openai_api_key=os.getenv('OPENAI_API_KEY'),
     model="text-embedding-ada-002"
-    )
+)
 
 graph = Neo4jGraph(
     url=os.getenv('NEO4J_URI'),
@@ -31,7 +34,9 @@ graph = Neo4jGraph(
 
 doc_transformer = LLMGraphTransformer(
     llm=llm,
-    )
+    allowed_nodes=["Technology", "Concept", "Skill", "Event", "Person", "Object"],
+    node_properties=["name", "description"],
+)
 
 # Load and split the documents
 loader = DirectoryLoader(DOCS_PATH, glob="**/*.pdf", loader_cls=PyPDFLoader)
@@ -90,8 +95,8 @@ for chunk in chunks:
                     source=chunk_node,
                     target=node, 
                     type="HAS_ENTITY"
-                    )
                 )
+            )
 
     # add the graph documents to the graph
     graph.add_graph_documents(graph_docs)

@@ -1,10 +1,11 @@
 from langchain_openai import OpenAIEmbeddings
 from langchain_neo4j import Neo4jGraph
 
+
 embedding_provider = OpenAIEmbeddings(
     openai_api_key=os.getenv('OPENAI_API_KEY'),
     model="text-embedding-ada-002"
-    )
+)
 
 graph = Neo4jGraph(
     url=os.getenv('NEO4J_URI'),
