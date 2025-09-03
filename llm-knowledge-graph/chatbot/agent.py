@@ -13,6 +13,7 @@ from utils import get_session_id
 from tools.vector import find_chunk
 from tools.cypher import run_cypher
 
+
 chat_prompt = ChatPromptTemplate.from_messages(
     [
         ("system", "You are an AI expert providing information about Neo4j and Knowledge Graphs."),
@@ -35,8 +36,8 @@ tools = [
     ),
     Tool.from_function(
         name="Knowledge Graph information",
-        description="For when you need to find information about the entities and relationship in the knowledge graph",
-        func = run_cypher,
+        description="For when you need to find information about the entities and relationship in the knowledge graph, when the user asks some qpecific question - e. g., most popular things",
+        func=run_cypher,
     )
 ]
 
@@ -88,7 +89,7 @@ agent_executor = AgentExecutor(
     tools=tools,
     handle_parsing_errors=True,
     verbose=True
-    )
+)
 
 chat_agent = RunnableWithMessageHistory(
     agent_executor,
