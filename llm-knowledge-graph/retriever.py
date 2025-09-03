@@ -1,7 +1,5 @@
 import os
 from dotenv import load_dotenv
-load_dotenv()
-
 from langchain_openai import ChatOpenAI
 from langchain_openai import OpenAIEmbeddings
 from langchain_neo4j import Neo4jGraph, Neo4jVector
@@ -9,19 +7,22 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains.retrieval import create_retrieval_chain
 from langchain_core.prompts import ChatPromptTemplate
 
+
+load_dotenv()
+
 llm = ChatOpenAI(
-    openai_api_key=os.getenv('OPENAI_API_KEY'), 
+    openai_api_key=os.getenv("OPENAI_API_KEY"), 
     temperature=0
 )
 
 embedding_provider = OpenAIEmbeddings(
-    openai_api_key=os.getenv('OPENAI_API_KEY')
-    )
+    openai_api_key=os.getenv("OPENAI_API_KEY")
+)
 
 graph = Neo4jGraph(
-    url=os.getenv('NEO4J_URI'),
-    username=os.getenv('NEO4J_USERNAME'),
-    password=os.getenv('NEO4J_PASSWORD')
+    url=os.getenv("NEO4J_URI"),
+    username=os.getenv("NEO4J_USERNAME"),
+    password=os.getenv("NEO4J_PASSWORD")
 )
 
 chunk_vector = Neo4jVector.from_existing_index(
