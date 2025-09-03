@@ -4,17 +4,25 @@ from langchain_neo4j import GraphCypherQAChain, Neo4jGraph
 from langchain.prompts import PromptTemplate
 
 from dotenv import load_dotenv
+
+
 load_dotenv()
 
-llm = ChatOpenAI(
-    openai_api_key=os.getenv('OPENAI_API_KEY'), 
+qa_llm = ChatOpenAI(
+    openai_api_key=os.getenv("OPENAI_API_KEY"), 
+    model="gpt-3.5-turbo",
+)
+
+cypher_llm = ChatOpenAI(
+    openai_api_key=os.getenv("OPENAI_API_KEY"), 
+    model="gpt-4",
     temperature=0
 )
 
 graph = Neo4jGraph(
-    url=os.getenv('NEO4J_URI'),
-    username=os.getenv('NEO4J_USERNAME'),
-    password=os.getenv('NEO4J_PASSWORD')
+    url=os.getenv("NEO4J_URI"),
+    username=os.getenv("NEO4J_USERNAME"),
+    password=os.getenv("NEO4J_PASSWORD")
 )
 
 CYPHER_GENERATION_TEMPLATE = """Task:Generate Cypher statement to query a graph database.
@@ -28,6 +36,16 @@ Always use case insensitive search when matching strings.
 Schema:
 {schema}
 
+Examples: 
+# Use case insensitive matching for entity ids
+MATCH (c:Chunk)-[:HAS_ENTITY]->(e)
+WHERE e.id =~ '(?i)entityName'
+
+# Find documents that reference entities
+MATCH (d:Document)<-[:PART_OF]-(:Chunk)-[:HAS_ENTITY]->(e)
+WHERE e.id =~ '(?i)entityName'
+RETURN d
+
 The question is:
 {question}"""
 
@@ -37,7 +55,8 @@ cypher_generation_prompt = PromptTemplate(
 )
 
 cypher_chain = GraphCypherQAChain.from_llm(
-    llm,
+    qa_llm=qa_llm,
+    cypher_llm=cypher_llm,
     graph=graph,
     cypher_prompt=cypher_generation_prompt,
     verbose=True,
